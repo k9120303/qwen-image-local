@@ -56,11 +56,6 @@
   function comboReady(ditId, speedId) {
     return state.setup?.status?.ditReady?.[`${ditId}:${speedId}`] === true;
   }
-  // Uncensored only ships base-tier weights, so its badge always follows the base combo.
-  function speedForDit(ditId) {
-    const cur = state.setup?.config.speed || "base";
-    return ditId === "uncensored" ? "base" : cur;
-  }
   function ditBadge(btn, ready) {
     const name = btn.querySelector(".p-name");
     let b = name.querySelector(".p-badge");
@@ -77,9 +72,15 @@
   }
   function renderDitGroup(rootId) {
     const cur = state.setup?.config.dit || "official";
+    const speed = state.setup?.config.speed || "base";
     document.querySelectorAll(`#${rootId} [data-dit]`).forEach((btn) => {
-      btn.setAttribute("aria-checked", String(btn.dataset.dit === cur));
-      ditBadge(btn, comboReady(btn.dataset.dit, speedForDit(btn.dataset.dit)));
+      const id = btn.dataset.dit;
+      btn.setAttribute("aria-checked", String(id === cur));
+      const supported = comboSupported(id, speed);
+      btn.disabled = !supported || state.installing;
+      btn.title = supported ? "" : t("turboUnsupported");
+      if (supported) ditBadge(btn, comboReady(id, speed));
+      else unsupportedBadge(btn);
     });
   }
   function renderDitTags() {
@@ -88,11 +89,7 @@
     $("ditTag").textContent = speed === "turbo" ? `${dit} · turbo` : dit;
   }
   function renderDitMain() {
-    const cur = state.setup?.config.dit || "official";
-    document.querySelectorAll("#ditsMain [data-dit]").forEach((btn) => {
-      btn.setAttribute("aria-checked", String(btn.dataset.dit === cur));
-      ditBadge(btn, comboReady(btn.dataset.dit, speedForDit(btn.dataset.dit)));
-    });
+    renderDitGroup("ditsMain");
   }
   function renderSpeedGroup(rootId) {
     const curDit = state.setup?.config.dit || "official";
@@ -171,7 +168,7 @@
     if (state.installing) { btn.textContent = t("installing"); btn.disabled = true; }
     else if (s.status.ready) { btn.textContent = t("startApp"); btn.disabled = false; }
     else { btn.textContent = state.failed ? t("retry") : t("install", dl ? fmtBytes(dl) : "0 MB"); btn.disabled = blocked; }
-    document.querySelectorAll("#profiles button, #dits button, #modelsPick").forEach((b) => { b.disabled = state.installing; });
+    document.querySelectorAll("#profiles button, #modelsPick").forEach((b) => { b.disabled = state.installing; });
   }
 
   document.querySelectorAll("#profiles [data-profile]").forEach((b) =>
