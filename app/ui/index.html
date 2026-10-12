@@ -106,6 +106,24 @@
           <div class="group grow">
             <span class="label" data-i18n="whatInstalls"></span>
             <div class="steps" id="steps"></div>
+            <div class="manual">
+              <p class="hint" data-i18n="manualHint"></p>
+              <button type="button" class="btn btn-sm" id="copyLinks" data-i18n="copyLinks"></button>
+            </div>
+            <div class="group">
+              <span class="label" data-i18n="srcLabel"></span>
+              <div class="presets" id="sources" role="radiogroup">
+                <button type="button" role="radio" data-source="official" aria-checked="true">
+                  <span class="p-name" data-i18n="srcOfficial"></span>
+                  <span class="p-meta mono" data-i18n="srcOfficialMeta"></span>
+                </button>
+                <button type="button" role="radio" data-source="mirror" aria-checked="false">
+                  <span class="p-name" data-i18n="srcMirror"></span>
+                  <span class="p-meta mono" data-i18n="srcMirrorMeta"></span>
+                </button>
+              </div>
+              <p class="hint" data-i18n="srcHint"></p>
+            </div>
             <details class="log" id="logBox">
               <summary data-i18n="details"></summary>
               <pre id="log"></pre>

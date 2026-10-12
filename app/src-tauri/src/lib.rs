@@ -3,7 +3,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::RwLock;
 
 use base64::Engine as _;
-use qil_core::{engine, generate, gpu, setup, surprise, Config, Dit, Engine, EngineState, GenRequest, GenResult, Profile, Speed};
+use qil_core::{engine, generate, gpu, setup, surprise, Config, Dit, Engine, EngineState, GenRequest, GenResult, Profile, Source, Speed};
 use serde::Serialize;
 use tauri::{AppHandle, Emitter, Manager, RunEvent, State};
 use tauri_plugin_dialog::DialogExt;
@@ -50,7 +50,7 @@ async fn setup_status(settings: State<'_, Settings>) -> Result<SetupInfo, String
 }
 
 #[tauri::command]
-fn setup_configure(settings: State<'_, Settings>, profile: Profile, dit: Option<Dit>, speed: Option<Speed>, models_dir: Option<String>) -> Result<Config, String> {
+fn setup_configure(settings: State<'_, Settings>, profile: Profile, dit: Option<Dit>, speed: Option<Speed>, source: Option<Source>, models_dir: Option<String>) -> Result<Config, String> {
     let mut c = settings.0.write().unwrap();
     c.profile = profile;
     if let Some(d) = dit {
@@ -59,12 +59,34 @@ fn setup_configure(settings: State<'_, Settings>, profile: Profile, dit: Option<
     if let Some(s) = speed {
         c.speed = s;
     }
+    if let Some(s) = source {
+        c.source = s;
+    }
     if let Some(d) = models_dir.filter(|d| !d.trim().is_empty()) {
         c.models_dir = PathBuf::from(d);
     }
     // Persist immediately so the choice survives a restart; setup::run saves again at the end.
     c.save().map_err(|e| e.to_string())?;
     Ok(c.clone())
+}
+
+/// The download URLs for the models this config needs, so the UI can offer copy links
+/// for users who prefer to fetch the weights manually.
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct ModelUrl {
+    name: String,
+    url: String,
+    size: u64,
+}
+
+#[tauri::command]
+fn model_urls(settings: State<'_, Settings>) -> Vec<ModelUrl> {
+    let c = cfg(&settings);
+    c.models()
+        .iter()
+        .map(|m| ModelUrl { name: m.name.to_string(), url: m.url_for(c.source), size: m.size })
+        .collect()
 }
 
 #[tauri::command]
@@ -307,6 +329,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             setup_status,
             setup_configure,
+            model_urls,
             setup_run,
             pick_folder,
             engine_start,

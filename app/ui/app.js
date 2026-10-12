@@ -131,6 +131,10 @@
     renderDitGroup("dits");
     renderSpeedGroup("speeds");
     renderDitTags();
+    document.querySelectorAll("#sources [data-source]").forEach((b) => {
+      b.setAttribute("aria-checked", String(b.dataset.source === (s.config.source || "official")));
+      b.disabled = state.installing;
+    });
     document.querySelectorAll("[data-rec]").forEach((el) => { el.hidden = el.dataset.rec !== s.recommended; });
     $("modelsDir").textContent = s.config.modelsDir;
     $("modelsDir").title = s.config.modelsDir;
@@ -168,30 +172,40 @@
     if (state.installing) { btn.textContent = t("installing"); btn.disabled = true; }
     else if (s.status.ready) { btn.textContent = t("startApp"); btn.disabled = false; }
     else { btn.textContent = state.failed ? t("retry") : t("install", dl ? fmtBytes(dl) : "0 MB"); btn.disabled = blocked; }
-    document.querySelectorAll("#profiles button, #modelsPick").forEach((b) => { b.disabled = state.installing; });
+    document.querySelectorAll("#profiles button, #modelsPick, #sources button").forEach((b) => { b.disabled = state.installing; });
   }
 
   document.querySelectorAll("#profiles [data-profile]").forEach((b) =>
     b.addEventListener("click", async () => {
-      await invoke("setup_configure", { profile: b.dataset.profile, dit: null, speed: null, modelsDir: null });
+      await invoke("setup_configure", { profile: b.dataset.profile, dit: null, speed: null, source: null, modelsDir: null });
       loadSetup();
     }));
   document.querySelectorAll("#dits [data-dit]").forEach((b) =>
     b.addEventListener("click", async () => {
       // Uncensored ships base-tier weights only: switching to it drops turbo back to base.
       const speed = b.dataset.dit === "uncensored" ? "base" : null;
-      await invoke("setup_configure", { profile: state.setup.config.profile, dit: b.dataset.dit, speed, modelsDir: null });
+      await invoke("setup_configure", { profile: state.setup.config.profile, dit: b.dataset.dit, speed, source: null, modelsDir: null });
       loadSetup();
     }));
   document.querySelectorAll("#speeds [data-speed]").forEach((b) =>
     b.addEventListener("click", async () => {
-      await invoke("setup_configure", { profile: state.setup.config.profile, dit: null, speed: b.dataset.speed, modelsDir: null });
+      await invoke("setup_configure", { profile: state.setup.config.profile, dit: null, speed: b.dataset.speed, source: null, modelsDir: null });
       loadSetup();
     }));
+  document.querySelectorAll("#sources [data-source]").forEach((b) =>
+    b.addEventListener("click", async () => {
+      await invoke("setup_configure", { profile: state.setup.config.profile, dit: null, speed: null, source: b.dataset.source, modelsDir: null });
+      loadSetup();
+    }));
+  $("copyLinks").addEventListener("click", async () => {
+    const urls = await invoke("model_urls");
+    const text = urls.map((u) => u.url).join("\n");
+    try { await navigator.clipboard.writeText(text); notify(t("linksCopied"), true); } catch { notify(t("copyFail")); }
+  });
   $("modelsPick").addEventListener("click", async () => {
     const dir = await invoke("pick_folder");
     if (!dir) return;
-    await invoke("setup_configure", { profile: state.setup.config.profile, dit: null, speed: null, modelsDir: dir });
+    await invoke("setup_configure", { profile: state.setup.config.profile, dit: null, speed: null, source: null, modelsDir: dir });
     loadSetup();
   });
   $("installBtn").addEventListener("click", async () => {
@@ -300,12 +314,12 @@
       const speed = id === "uncensored" ? "base" : (state.setup?.config.speed || "base");
       if (!comboReady(id, speed)) {
         notify(t("ditNeedInstall", t(DIT_LABEL[id])));
-        await invoke("setup_configure", { profile: state.setup.config.profile, dit: id, speed, modelsDir: null });
+        await invoke("setup_configure", { profile: state.setup.config.profile, dit: id, speed, source: null, modelsDir: null });
         await loadSetup();
         backToSetup();
         return;
       }
-      await invoke("setup_configure", { profile: state.setup.config.profile, dit: id, speed, modelsDir: null });
+      await invoke("setup_configure", { profile: state.setup.config.profile, dit: id, speed, source: null, modelsDir: null });
       await loadSetup();
       renderDitTags();
       renderDitMain();
@@ -322,12 +336,12 @@
       const curDit = state.setup?.config.dit || "official";
       if (!comboReady(curDit, id)) {
         notify(t("ditNeedInstall", t(SPEED_LABEL[id])));
-        await invoke("setup_configure", { profile: state.setup.config.profile, dit: null, speed: id, modelsDir: null });
+        await invoke("setup_configure", { profile: state.setup.config.profile, dit: null, speed: id, source: null, modelsDir: null });
         await loadSetup();
         backToSetup();
         return;
       }
-      await invoke("setup_configure", { profile: state.setup.config.profile, dit: null, speed: id, modelsDir: null });
+      await invoke("setup_configure", { profile: state.setup.config.profile, dit: null, speed: id, source: null, modelsDir: null });
       await loadSetup();
       renderDitTags();
       renderDitMain();

@@ -265,7 +265,7 @@ pub fn run(cfg: &Config, emit: &mut dyn FnMut(Event)) -> Result<(), String> {
             continue;
         }
         step(emit, &id, "running", human_bytes(m.size));
-        download::fetch(&m.url(), &dest, Some(m.size), &mut |p| {
+        download::fetch(&m.url_for(cfg.source), &dest, Some(m.size), &mut |p| {
             emit(Event::Progress { id: id.clone(), done: p.done, total: p.total, bytes_per_sec: p.bytes_per_sec })
         })?;
         step(emit, &id, "running", "verifying checksum".into());

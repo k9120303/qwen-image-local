@@ -18,6 +18,8 @@ pub const MIN_DRIVER_MAJOR: u32 = 580;
 pub const HF_BASE: &str = "https://huggingface.co/Comfy-Org/Qwen-Image-2.1/resolve/main";
 /// Alternative DiT release: uncensored int8 convrot weights hosted in a different repo.
 pub const HF_BASE_UC: &str = "https://huggingface.co/abenzerps/Qwen-Image-2.1-Uncensored-GGUF/resolve/main";
+/// HuggingFace mirror for users behind restricted networks (same paths, different host).
+pub const HF_MIRROR: &str = "https://hf-mirror.com";
 
 #[derive(Debug, Clone, Copy)]
 pub struct ModelFile {
@@ -33,15 +35,63 @@ pub struct ModelFile {
 }
 
 impl ModelFile {
-    pub fn url(&self) -> String {
+    pub fn url_for(self, source: Source) -> String {
         let base = self.base.unwrap_or(HF_BASE);
-        match self.remote {
+        let url = match self.remote {
             Some(r) => format!("{base}/{r}"),
             None => format!("{base}/{}/{}", self.folder, self.name),
-        }
+        };
+        source.apply(&url)
+    }
+    pub fn url(&self) -> String {
+        self.url_for(Source::Official)
     }
     pub fn path(&self, models_dir: &Path) -> PathBuf {
         models_dir.join(self.folder).join(self.name)
+    }
+}
+
+/// Where the model weights are downloaded from. Orthogonal to `Dit`/`Speed`/`Profile`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
+#[serde(rename_all = "lowercase")]
+pub enum Source {
+    /// Download from huggingface.co (default).
+    #[default]
+    Official,
+    /// Download from hf-mirror.com, a HuggingFace mirror usable behind restricted networks.
+    Mirror,
+}
+
+impl Source {
+    /// Stable id used in the UI and config JSON.
+    pub fn id(self) -> &'static str {
+        match self {
+            Source::Official => "official",
+            Source::Mirror => "mirror",
+        }
+    }
+    pub fn all() -> [Source; 2] {
+        [Source::Official, Source::Mirror]
+    }
+    pub fn label(self) -> &'static str {
+        match self {
+            Source::Official => "Hugging Face",
+            Source::Mirror => "hf-mirror.com",
+        }
+    }
+    /// Rewrite a huggingface.co URL to the mirror host; other hosts pass through untouched.
+    pub fn apply(self, url: &str) -> String {
+        match self {
+            Source::Official => url.to_string(),
+            Source::Mirror => url.replace("https://huggingface.co/", &format!("{HF_MIRROR}/")),
+        }
+    }
+    pub fn parse(s: &str) -> Option<Source> {
+        match s.to_ascii_lowercase().as_str() {
+            "official" | "hf" | "huggingface" | "default" => Some(Source::Official),
+            "mirror" | "hf-mirror" | "cn" => Some(Source::Mirror),
+            _ => None,
+        }
     }
 }
 
@@ -251,6 +301,9 @@ pub struct Config {
     /// Sampling-speed tier: standard checkpoint or the distilled 8-step Turbo.
     #[serde(default)]
     pub speed: Speed,
+    /// Where the weights are downloaded from (HuggingFace or the hf-mirror.com mirror).
+    #[serde(default)]
+    pub source: Source,
     /// Where generated images go.
     pub output_dir: PathBuf,
     #[serde(default = "default_port")]
@@ -278,6 +331,7 @@ impl Default for Config {
             profile: Profile::default(),
             dit: Dit::default(),
             speed: Speed::default(),
+            source: Source::default(),
             output_dir: dirs::picture_dir()
                 .unwrap_or_else(|| dirs::home_dir().unwrap_or_default().join("Pictures"))
                 .join("Qwen Image Local"),
@@ -414,5 +468,33 @@ mod tests {
         let c: Config = serde_json::from_str(old).unwrap();
         assert_eq!(c.speed, Speed::Base);
         assert_eq!(c.models()[0].name, DIT_UC.name);
+    }
+
+    #[test]
+    fn source_mirror_rewrites_only_hf_urls() {
+        // Official source keeps huggingface.co untouched.
+        assert_eq!(DIT.url_for(Source::Official), DIT.url());
+        assert!(DIT.url_for(Source::Official).starts_with("https://huggingface.co/"));
+        // Mirror swaps the host for both the Comfy-Org repo and the third-party uncensored repo.
+        assert_eq!(
+            DIT.url_for(Source::Mirror),
+            "https://hf-mirror.com/Comfy-Org/Qwen-Image-2.1/resolve/main/diffusion_models/qwen_image_2.1_int8_convrot.safetensors"
+        );
+        assert_eq!(
+            DIT_UC.url_for(Source::Mirror),
+            "https://hf-mirror.com/abenzerps/Qwen-Image-2.1-Uncensored-GGUF/resolve/main/qwen-image-2.1-UC-int8_convrot.safetensors"
+        );
+        assert_eq!(Source::parse("hf-mirror"), Some(Source::Mirror));
+        assert_eq!(Source::parse("mirror"), Some(Source::Mirror));
+        assert_eq!(Source::parse("nonsense"), None);
+    }
+
+    #[test]
+    fn source_is_backward_compatible_in_json() {
+        // A config.json without the "source" key must still deserialize (defaults to official).
+        let old = r#"{"runtimeDir":"r","modelsDir":"m","profile":"compact","outputDir":"o","port":8188}"#;
+        let c: Config = serde_json::from_str(old).unwrap();
+        assert_eq!(c.source, Source::Official);
+        assert!(c.models()[0].url_for(c.source).starts_with("https://huggingface.co/"));
     }
 }

@@ -353,6 +353,8 @@ input.mono { font-family: var(--font-mono); font-size: 12px; }
 .s-bar { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; }
 .s-bar i { display: block; height: 100%; background: var(--text); transition: width 0.25s ease; }
 .srow .dot.ok ~ .s-bar i { background: var(--ok); opacity: 0.5; }
+.manual { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.manual .hint { flex: 1; }
 .log { border: 1px solid var(--border); border-radius: var(--r); background: var(--panel); }
 .log summary { cursor: pointer; padding: 7px 12px; font: 600 11px var(--font-sans); text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }
 .log pre { margin: 0; max-height: 200px; overflow: auto; padding: 10px 12px; border-top: 1px solid var(--border); background: #161617; color: #d6d6d3; font: 11px/1.55 var(--font-mono); white-space: pre-wrap; word-break: break-word; }
