@@ -3,6 +3,7 @@
   const S = {
     en: {
       openFolder: "Open folder",
+      themeSystem: "Theme: follow system", themeLight: "Theme: light", themeDark: "Theme: dark",
       engineReady: "Engine ready", engineReadyExt: "Engine ready (external)", engineStarting: "Starting engine",
       engineError: "Engine error", engineOff: "Engine off", stopEngine: "Stop engine", startEngine: "Start engine", starting: "Starting…",
       externalTip: "Another program started this engine; close it from there.",
@@ -78,6 +79,7 @@
     },
     es: {
       openFolder: "Abrir carpeta",
+      themeSystem: "Tema: seguir al sistema", themeLight: "Tema: claro", themeDark: "Tema: oscuro",
       engineReady: "Motor listo", engineReadyExt: "Motor listo (externo)", engineStarting: "Encendiendo motor",
       engineError: "Motor con error", engineOff: "Motor apagado", stopEngine: "Apagar motor", startEngine: "Encender motor", starting: "Encendiendo…",
       externalTip: "Este motor lo abrió otro programa; cerralo desde ahí.",
@@ -153,6 +155,7 @@
     },
     zh: {
       openFolder: "打开文件夹",
+      themeSystem: "主题：跟随系统", themeLight: "主题：浅色", themeDark: "主题：深色",
       engineReady: "引擎已就绪", engineReadyExt: "引擎已就绪（外部）", engineStarting: "引擎启动中",
       engineError: "引擎出错", engineOff: "引擎已关闭", stopEngine: "停止引擎", startEngine: "启动引擎", starting: "启动中…",
       externalTip: "这个引擎是被其他程序启动的；请到那边关闭它。",

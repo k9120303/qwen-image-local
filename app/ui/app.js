@@ -700,8 +700,20 @@
     renderDitMain();
     renderSpeedGroup("speeds");
     renderSpeedGroup("speedsMain");
+    syncThemeTitle();
     if (state.current) showImage(state.current);
   });
+
+  // Theme (system → light → dark)
+  const themeBtn = $("themeBtn");
+  function syncThemeTitle() {
+    const k = window.qilTheme.labelKey();
+    themeBtn.title = t(k);
+    themeBtn.setAttribute("aria-label", t(k));
+  }
+  themeBtn.addEventListener("click", () => window.qilTheme.cycle());
+  window.addEventListener("themechange", syncThemeTitle);
+  syncThemeTitle();
 
   // Tauri events (drag & drop events carry real file paths)
   async function wireEvents() {
