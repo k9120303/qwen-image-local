@@ -70,6 +70,31 @@
     b.textContent = t("speedUnsupported");
     b.classList.remove("missing");
   }
+  // Uncensored: alert icon right of the badge, hover shows a warning tip, and clicking
+  // the button asks for confirmation first (skippable via the "don't ask again" checkbox).
+  const UC_DISCUSS_URL = "https://huggingface.co/abenzerps/Qwen-Image-2.1-Uncensored-GGUF/discussions/20";
+  function ucAlertIcon(btn) {
+    const name = btn.querySelector(".p-name");
+    let a = name.querySelector(".p-alert");
+    if (!a) {
+      a = document.createElement("span");
+      a.className = "p-alert";
+      a.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+    }
+    name.appendChild(a); // re-append so the icon always sits after the badge
+    a.setAttribute("data-tip", t("ditUcWarn"));
+  }
+  const ucAcked = () => localStorage.getItem("qil.ucAck") === "1";
+  let ucProceedFn = null;
+  function openUcDialog(fn) {
+    ucProceedFn = fn;
+    $("ucDontAsk").checked = false;
+    $("ucDialog").hidden = false;
+  }
+  function closeUcDialog() {
+    $("ucDialog").hidden = true;
+    ucProceedFn = null;
+  }
   function renderDitGroup(rootId) {
     const cur = state.setup?.config.dit || "official";
     const speed = state.setup?.config.speed || "base";
@@ -81,6 +106,7 @@
       btn.title = supported ? "" : t("turboUnsupported");
       if (supported) ditBadge(btn, comboReady(id, speed));
       else unsupportedBadge(btn);
+      if (id === "uncensored") ucAlertIcon(btn);
     });
   }
   function renderDitTags() {
@@ -181,12 +207,17 @@
       loadSetup();
     }));
   document.querySelectorAll("#dits [data-dit]").forEach((b) =>
-    b.addEventListener("click", async () => {
-      // Uncensored ships base-tier weights only: switching to it drops turbo back to base.
-      const speed = b.dataset.dit === "uncensored" ? "base" : null;
-      await invoke("setup_configure", { profile: state.setup.config.profile, dit: b.dataset.dit, speed, source: null, modelsDir: null });
-      loadSetup();
+    b.addEventListener("click", () => {
+      const id = b.dataset.dit;
+      if (id === "uncensored" && !ucAcked()) { openUcDialog(() => applyDitSetup(id)); return; }
+      applyDitSetup(id);
     }));
+  async function applyDitSetup(id) {
+    // Uncensored ships base-tier weights only: switching to it drops turbo back to base.
+    const speed = id === "uncensored" ? "base" : null;
+    await invoke("setup_configure", { profile: state.setup.config.profile, dit: id, speed, source: null, modelsDir: null });
+    loadSetup();
+  }
   document.querySelectorAll("#speeds [data-speed]").forEach((b) =>
     b.addEventListener("click", async () => {
       await invoke("setup_configure", { profile: state.setup.config.profile, dit: null, speed: b.dataset.speed, source: null, modelsDir: null });
@@ -306,27 +337,43 @@
   // Generation model (main view): switching to a model whose weights are missing
   // only warns and sends the user back to the installer — it never downloads on its own.
   document.querySelectorAll("#ditsMain [data-dit]").forEach((b) =>
-    b.addEventListener("click", async () => {
+    b.addEventListener("click", () => {
       const id = b.dataset.dit;
       const curDit = state.setup?.config.dit || "official";
       if (id === curDit) return;
-      // Uncensored ships base-tier weights only; official keeps the current speed.
-      const speed = id === "uncensored" ? "base" : (state.setup?.config.speed || "base");
-      if (!comboReady(id, speed)) {
-        notify(t("ditNeedInstall", t(DIT_LABEL[id])));
-        await invoke("setup_configure", { profile: state.setup.config.profile, dit: id, speed, source: null, modelsDir: null });
-        await loadSetup();
-        backToSetup();
-        return;
-      }
+      if (id === "uncensored" && !ucAcked()) { openUcDialog(() => applyDitMain(id)); return; }
+      applyDitMain(id);
+    }));
+
+  async function applyDitMain(id) {
+    // Uncensored ships base-tier weights only; official keeps the current speed.
+    const speed = id === "uncensored" ? "base" : (state.setup?.config.speed || "base");
+    if (!comboReady(id, speed)) {
+      notify(t("ditNeedInstall", t(DIT_LABEL[id])));
       await invoke("setup_configure", { profile: state.setup.config.profile, dit: id, speed, source: null, modelsDir: null });
       await loadSetup();
-      renderDitTags();
-      renderDitMain();
-      renderSpeedGroup("speedsMain");
-      renderPresets();
-      notify(t("ditSwitched", t(DIT_LABEL[id])), true);
-    }));
+      backToSetup();
+      return;
+    }
+    await invoke("setup_configure", { profile: state.setup.config.profile, dit: id, speed, source: null, modelsDir: null });
+    await loadSetup();
+    renderDitTags();
+    renderDitMain();
+    renderSpeedGroup("speedsMain");
+    renderPresets();
+    notify(t("ditSwitched", t(DIT_LABEL[id])), true);
+  }
+
+  // Uncensored warning dialog: discuss link, cancel, proceed (with "don't ask again").
+  $("ucCancel").addEventListener("click", closeUcDialog);
+  $("ucDiscuss").addEventListener("click", () => invoke("open_url", { url: UC_DISCUSS_URL }).catch(() => {}));
+  $("ucProceed").addEventListener("click", () => {
+    if ($("ucDontAsk").checked) localStorage.setItem("qil.ucAck", "1");
+    const fn = ucProceedFn;
+    closeUcDialog();
+    if (fn) fn();
+  });
+  $("ucDialog").addEventListener("click", (e) => { if (e.target === $("ucDialog")) closeUcDialog(); });
 
   // Sampling speed (main view): same rule as the model switch — warn and go back if not downloaded.
   document.querySelectorAll("#speedsMain [data-speed]").forEach((b) =>
@@ -681,6 +728,7 @@
   document.addEventListener("keydown", (e) => {
     if (e.key === "Enter" && (e.ctrlKey || e.metaKey) && !$("mainView").hidden) { e.preventDefault(); generate(); }
     if (e.key === "Escape") {
+      if (!$("ucDialog").hidden) { closeUcDialog(); return; }
       const z = document.querySelector(".zoom");
       if (z) z.remove();
       else if (state.busy) invoke("cancel");
