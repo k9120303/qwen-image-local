@@ -1,4 +1,4 @@
-/* Theme switch: three logical modes — system / light / dark.
+/* Theme switch: three logical modes — system / light / dark, plus an accent color.
    Loaded synchronously in <head> so the theme is set before first paint (no flash).
    The chosen mode persists in localStorage; "system" resolves the OS preference
    and keeps following it live. CSS only needs html[data-theme="dark"]. */
@@ -34,5 +34,26 @@
     },
     cycle() { this.set(MODES[(MODES.indexOf(mode) + 1) % MODES.length]); },
     labelKey() { return "theme" + mode[0].toUpperCase() + mode.slice(1); },
+  };
+
+  // Accent color, independent of light/dark. CSS keys off html[data-accent].
+  const AKEY = "qil.accent";
+  const ACCENTS = ["mono", "blue", "green", "violet", "orange"];
+  let accent = "mono";
+  try {
+    const saved = localStorage.getItem(AKEY);
+    if (ACCENTS.includes(saved)) accent = saved;
+  } catch { /* no storage */ }
+  root.dataset.accent = accent;
+
+  window.qilAccent = {
+    get name() { return accent; },
+    cycle() {
+      accent = ACCENTS[(ACCENTS.indexOf(accent) + 1) % ACCENTS.length];
+      root.dataset.accent = accent;
+      try { localStorage.setItem(AKEY, accent); } catch { /* no storage */ }
+      window.dispatchEvent(new Event("themechange"));
+    },
+    labelKey() { return "accent" + accent[0].toUpperCase() + accent.slice(1); },
   };
 })();

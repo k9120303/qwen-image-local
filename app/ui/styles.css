@@ -361,6 +361,17 @@ html[data-theme-mode="light"] .theme-btn .ic-auto,
 html[data-theme-mode="dark"] .theme-btn .ic-auto { display: none; }
 html[data-theme-mode="light"] .theme-btn .ic-sun { display: block; }
 html[data-theme-mode="dark"] .theme-btn .ic-moon { display: block; }
+.theme-btn .accent-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--primary); box-shadow: 0 0 0 1px var(--border-strong); }
+
+/* Accent colors: only the primary action changes; state colors stay as-is. */
+html[data-accent="blue"]   { --primary: #2563eb; --primary-hover: #1d4ed8; --on-primary: #ffffff; }
+html[data-accent="green"]  { --primary: #15803d; --primary-hover: #166534; --on-primary: #ffffff; }
+html[data-accent="violet"] { --primary: #7c3aed; --primary-hover: #6d28d9; --on-primary: #ffffff; }
+html[data-accent="orange"] { --primary: #ea580c; --primary-hover: #c2410c; --on-primary: #ffffff; }
+html[data-theme="dark"][data-accent="blue"]   { --primary: #60a5fa; --primary-hover: #93c5fd; --on-primary: #0b1220; }
+html[data-theme="dark"][data-accent="green"]  { --primary: #4ade80; --primary-hover: #86efac; --on-primary: #06140b; }
+html[data-theme="dark"][data-accent="violet"] { --primary: #a78bfa; --primary-hover: #c4b5fd; --on-primary: #130b24; }
+html[data-theme="dark"][data-accent="orange"] { --primary: #fb923c; --primary-hover: #fdba74; --on-primary: #1c0d03; }
 
 /* ── First-run setup ── */
 .setup { flex: 1; min-height: 0; overflow-y: auto; background: var(--bg); }
