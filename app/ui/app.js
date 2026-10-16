@@ -704,14 +704,19 @@
     if (state.current) showImage(state.current);
   });
 
-  // Theme (system → light → dark)
+  // Theme (system → light → dark) and accent color
   const themeBtn = $("themeBtn");
+  const accentBtn = $("accentBtn");
   function syncThemeTitle() {
     const k = window.qilTheme.labelKey();
     themeBtn.title = t(k);
     themeBtn.setAttribute("aria-label", t(k));
+    const a = t("accent", t(window.qilAccent.labelKey()));
+    accentBtn.title = a;
+    accentBtn.setAttribute("aria-label", a);
   }
   themeBtn.addEventListener("click", () => window.qilTheme.cycle());
+  accentBtn.addEventListener("click", () => window.qilAccent.cycle());
   window.addEventListener("themechange", syncThemeTitle);
   syncThemeTitle();
 
