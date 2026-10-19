@@ -6,6 +6,7 @@
 - **Download source.** Fetch the weights from Hugging Face or the hf-mirror.com mirror, for networks where huggingface.co is slow or blocked; the setup screen can also copy the download links for an external downloader.
 - **Themes.** Follow the system, light or dark, plus an accent color (mono, blue, green, violet, orange) for the primary button.
 - **Traditional Chinese.** UI dictionary with Taiwan wording, auto-picked for zh-TW/HK/MO, and a `README.zh-TW.md`.
+- **Uncensored model warning.** Picking the third-party uncensored weights shows a warning that their authenticity is disputed, with a link to the community discussion; the option carries a badge.
 
 ## 0.3.0 — 2026-10-11
 
