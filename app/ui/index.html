@@ -328,6 +328,20 @@
     <p class="ed-hint" data-i18n="edHint"></p>
   </div>
 
+  <!-- Uncensored weights: warning dialog before switching -->
+  <div class="uc-mask" id="ucDialog" hidden>
+    <div class="uc-card" role="alertdialog" aria-modal="true" aria-labelledby="ucTitle">
+      <h3 class="uc-title" id="ucTitle" data-i18n="ditUcTitle"></h3>
+      <p class="uc-body" data-i18n="ditUcBody"></p>
+      <label class="uc-ask"><input type="checkbox" id="ucDontAsk" /><span data-i18n="ditUcDontAsk"></span></label>
+      <div class="uc-foot">
+        <button type="button" class="btn btn-sm" id="ucDiscuss" data-i18n="ditUcDiscuss"></button>
+        <button type="button" class="btn btn-sm" id="ucCancel" data-i18n="cancel"></button>
+        <button type="button" class="btn btn-sm btn-primary" id="ucProceed" data-i18n="ditUcProceed"></button>
+      </div>
+    </div>
+  </div>
+
   <script src="vendor/fabric.min.js"></script>
   <script src="i18n.js"></script>
   <script src="editor.js"></script>
