@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0 — 2026-10-19
+
+- **Everything lives next to the exe.** `config.json`, the engine (`runtime\`, which also holds the default models folder), generated images (`output\`) and the UI's WebView2 data (`webview\`) now default to the folder holding the exe instead of `%APPDATA%`, `%LOCALAPPDATA%` and Pictures. Unzip it anywhere you can write to; uninstalling is deleting that folder. An install made by an earlier version keeps using its old paths.
+- **Download source.** Fetch the weights from Hugging Face or the hf-mirror.com mirror, for networks where huggingface.co is slow or blocked; the setup screen can also copy the download links for an external downloader.
+- **Themes.** Follow the system, light or dark, plus an accent color (mono, blue, green, violet, orange) for the primary button.
+- **Traditional Chinese.** UI dictionary with Taiwan wording, auto-picked for zh-TW/HK/MO, and a `README.zh-TW.md`.
+
 ## 0.3.0 — 2026-10-11
 
 - **Turbo speed tier.** Pick the distilled 8-step checkpoint instead of the 20–40-step standard one: about 3–4× faster sampling. It is orthogonal to the VRAM profile and the DiT choice, so you can run Turbo on Balanced or Compact; the Uncensored model doesn't have Turbo weights yet and falls back to the standard checkpoint. Selectable in the app (setup screen and main UI) and in the CLI (`qil setup --speed turbo`, `qil config --speed turbo`).
