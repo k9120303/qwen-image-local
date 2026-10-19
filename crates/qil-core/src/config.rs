@@ -1,7 +1,7 @@
 //! Configuration, paths and VRAM profiles.
 //!
 //! Everything the app installs lives under one runtime folder (default
-//! `%LOCALAPPDATA%\qwen-image-local`) so uninstalling is deleting a folder.
+//! `runtime\` next to the exe) so uninstalling is deleting a folder.
 //! The models folder can live elsewhere (another disk, or weights you already have).
 
 use std::path::{Path, PathBuf};
@@ -314,12 +314,26 @@ fn default_port() -> u16 {
     8188
 }
 
+/// Folder holding the executable: config and runtime live next to it by default.
+pub fn exe_dir() -> PathBuf {
+    std::env::current_exe()
+        .ok()
+        .and_then(|p| p.parent().map(Path::to_path_buf))
+        .unwrap_or_else(std::env::temp_dir)
+}
+
 pub fn config_path() -> PathBuf {
+    exe_dir().join("config.json")
+}
+
+/// Where earlier versions kept the config. Read when there is none next to the exe,
+/// so an existing install keeps its runtime and models instead of downloading again.
+fn legacy_config_path() -> PathBuf {
     dirs::config_dir().unwrap_or_else(std::env::temp_dir).join(APP_ID).join("config.json")
 }
 
 pub fn default_runtime_dir() -> PathBuf {
-    dirs::data_local_dir().unwrap_or_else(std::env::temp_dir).join(APP_ID)
+    exe_dir().join("runtime")
 }
 
 impl Default for Config {
@@ -332,9 +346,7 @@ impl Default for Config {
             dit: Dit::default(),
             speed: Speed::default(),
             source: Source::default(),
-            output_dir: dirs::picture_dir()
-                .unwrap_or_else(|| dirs::home_dir().unwrap_or_default().join("Pictures"))
-                .join("Qwen Image Local"),
+            output_dir: exe_dir().join("output"),
             port: default_port(),
         }
     }
@@ -344,6 +356,7 @@ impl Config {
     /// Loads the saved config. `QIL_RUNTIME` / `QIL_MODELS` override paths (handy for dev and CI).
     pub fn load() -> Config {
         let mut cfg: Config = std::fs::read(config_path())
+            .or_else(|_| std::fs::read(legacy_config_path()))
             .ok()
             .and_then(|b| serde_json::from_slice(&b).ok())
             .unwrap_or_default();
@@ -357,7 +370,7 @@ impl Config {
     }
 
     pub fn exists() -> bool {
-        config_path().is_file()
+        config_path().is_file() || legacy_config_path().is_file()
     }
 
     pub fn save(&self) -> std::io::Result<()> {
@@ -487,6 +500,15 @@ mod tests {
         assert_eq!(Source::parse("hf-mirror"), Some(Source::Mirror));
         assert_eq!(Source::parse("mirror"), Some(Source::Mirror));
         assert_eq!(Source::parse("nonsense"), None);
+    }
+
+    #[test]
+    fn config_and_runtime_live_next_to_exe() {
+        let exe = std::env::current_exe().unwrap();
+        assert_eq!(config_path().parent(), exe.parent());
+        assert_eq!(default_runtime_dir().parent(), exe.parent());
+        assert_eq!(Config::default().models_dir, default_runtime_dir().join("models"));
+        assert_eq!(Config::default().output_dir.parent(), exe.parent());
     }
 
     #[test]

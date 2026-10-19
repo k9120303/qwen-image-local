@@ -2,7 +2,7 @@
 
 <img src="assets/banner.jpg" alt="qwen-image-local —— 在 NVIDIA GPU 上本地运行 Qwen-Image-2.1 的文生图与照片编辑；这张横幅由模型在 RTX 3060 上先生成、再编辑而成。" width="100%"/>
 
-**语言：** 简体中文 · [English](README.md)
+**语言：** 简体中文 · [繁體中文](README.zh-TW.md) · [English](README.md)
 
 **写一句提示词，或最多拖入 10 张照片：Qwen-Image-2.1 在你 8 GB 显存的显卡上约 35 秒出图，全程不上传，内容一步都不离开这台电脑。**
 
@@ -180,7 +180,7 @@ git clone https://github.com/Mats2208/qwen-image-local && cd qwen-image-local
 
 从 [Releases](https://github.com/Mats2208/qwen-image-local/releases/latest) 下载 `Qwen.Image.Local_x.y.z_x64-setup.exe` 运行即可；它只装到你这个用户下，不需要管理员权限。由于没有代码签名（证书要花钱），首次运行时 SmartScreen 会警告：**更多信息 → 仍要运行**。
 
-两种方式，所有东西都在 `%LOCALAPPDATA%\qwen-image-local`（模型可以放到别的盘），卸载就是删掉这个文件夹。
+两种方式，所有东西都在 exe 旁边：`config.json`、`runtime\` 文件夹和存放生成图片的 `output\` 文件夹（模型可以放到别的盘），卸载就是删掉这个文件夹。exe 要放在可写入的文件夹，不要放 `C:\Program Files`。旧版本装好的环境会继续使用 `%LOCALAPPDATA%\qwen-image-local`。
 
 ## 快速上手（命令行）
 

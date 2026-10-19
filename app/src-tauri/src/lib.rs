@@ -324,6 +324,11 @@ pub fn run() {
             let out = app.state::<Settings>().0.read().unwrap().output_dir.clone();
             let _ = std::fs::create_dir_all(&out);
             let _ = app.asset_protocol_scope().allow_directory(&out, true);
+            // The window is created here, not from tauri.conf.json, so WebView2 keeps its
+            // data (UI preferences, cache) next to the exe instead of in %LOCALAPPDATA%.
+            tauri::WebviewWindowBuilder::from_config(app.handle(), &app.config().app.windows[0])?
+                .data_directory(qil_core::config::exe_dir().join("webview"))
+                .build()?;
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![

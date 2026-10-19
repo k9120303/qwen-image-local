@@ -2,7 +2,7 @@
 
 <img src="assets/banner.jpg" alt="qwen-image-local — run Qwen-Image-2.1 text-to-image and photo editing on a 12 GB NVIDIA GPU. This banner was generated and then edited by the model on an RTX 3060." width="100%"/>
 
-**Language: English · [简体中文](README.zh-CN.md)**
+**Language: English · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)**
 
 **Type a prompt or drop up to 10 photos: Qwen-Image-2.1 renders it on your 8 GB GPU in about 35 s, and nothing leaves your PC.**
 
@@ -180,7 +180,7 @@ All five run the same `build.ps1`, which checks the prerequisites (and tells you
 
 Download `Qwen.Image.Local_x.y.z_x64-setup.exe` from [Releases](https://github.com/Mats2208/qwen-image-local/releases/latest) and run it; it installs for your user only, no admin. It is not code-signed (certificates are paid), so SmartScreen will warn the first time: **More info → Run anyway**.
 
-Either way, everything lives in `%LOCALAPPDATA%\qwen-image-local` (models can go on another disk), and uninstalling is deleting that folder.
+Either way, everything lives next to the exe: `config.json`, a `runtime\` folder and an `output\` folder for your images (models can go on another disk), and uninstalling is deleting that folder. Keep the exe in a folder you can write to, not `C:\Program Files`. An install made by an earlier version keeps using `%LOCALAPPDATA%\qwen-image-local`.
 
 ## Quick start (CLI)
 

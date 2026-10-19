@@ -118,7 +118,7 @@ struct GenOpts {
     aspect: String,
     #[arg(long)]
     seed: Option<u64>,
-    /// Output .png file or folder (default: your Pictures\Qwen Image Local)
+    /// Output .png file or folder (default: the output folder next to the exe)
     #[arg(short, long)]
     out: Option<PathBuf>,
     /// Leave the engine running afterwards (faster next call)

@@ -11,6 +11,7 @@
     "windows": [
       {
         "label": "main",
+        "create": false,
         "title": "Qwen Image Local",
         "width": 1360,
         "height": 880,
