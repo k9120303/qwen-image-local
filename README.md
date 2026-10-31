@@ -63,9 +63,11 @@ Qwen-Image-2.1 came out on September 20, 2026. It is the first open-weight image
 | **Create** | Text → image | Draft 1024² · Standard 1.6 MP · Max native 2K, seven aspect ratios, lockable seed |
 | **Speed** | Turbo tier | Distilled 8-step checkpoint, about 3–4× faster sampling; pick it on top of any VRAM profile |
 | **Model** | Official or Uncensored | Swap the image model from the setup screen or the main UI; the encoder and VAE are shared, so it is one file |
+| **Source** | Official or hf-mirror | Pick where the weights download from — huggingface.co or hf-mirror.com — or copy the exact URLs and fetch them yourself |
 | **Transparency** | Native RGBA | Real alpha channel from the model, no background-removal tricks |
 | **Edit** | 1–10 reference photos | Relight, restyle, remove objects or people, rewrite signs, combine subjects; the first photo is the canvas |
 | **Annotate** | Markup editor | Draw, circle, box, arrow, erase or crop a reference photo before it goes in; undo, zoom and 90° rotation included |
+| **Look** | Themes & accents | Follow-system, light or dark, plus five accent colors; every choice is remembered across restarts |
 | **Surprise me** | Idea generator | Style × subject × place × light, or a curated idea; optional theme |
 | **Setup** | One-command build + one-time install | Pinned ComfyUI, Python 3.12, PyTorch CUDA 13, weights with resume and SHA-256 checks |
 | **CLI** | `qil` | `doctor` · `setup` · `generate` · `edit` · `surprise` · `bench` · `config` |
@@ -204,6 +206,7 @@ Ready. Try: qil generate "a red fox asleep in the snow" --preset draft
 ```bash
 qil setup                                             # install; profile picked from your VRAM
 qil config --speed turbo                              # distilled 8-step sampling on top of any profile
+qil config --source mirror                            # pull the weights from hf-mirror.com instead
 qil generate "a red fox asleep in the snow" --preset draft
 qil generate "a mate gourd sticker" --transparent --aspect 1:1
 qil edit "Change the scene to a snowy night" -i street.jpg --preset standard
@@ -244,7 +247,7 @@ The compact profile cuts peak VRAM by about 2.5 GB at the same speed and is veri
 ```
 crates/qil-core   installer, engine lifecycle, generation client, GPU detection (Rust)
 crates/qil-cli    the qil command line
-app/              Tauri 2 desktop app (Rust + plain HTML/CSS/JS, English and Spanish)
+app/              Tauri 2 desktop app (Rust + plain HTML/CSS/JS, English / Spanish / Simplified & Traditional Chinese)
 bench/            suite.json, input photos with credits, results, verdicts, site builder
 docs/             GitHub Pages benchmark site
 ```

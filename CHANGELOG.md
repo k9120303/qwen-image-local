@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.0 — 2026-10-31
+
+- **Download source: official or hf-mirror.** Pick where the weights come from — huggingface.co or hf-mirror.com — on the setup screen, in the app or via the CLI (`qil setup --source mirror`, `qil config --source mirror`). The mirror is a drop-in hostname swap, so the files and checksums are identical. The setup screen also lists the exact URLs for the current model combination with a one-click copy button: download them yourself and point the app at the folder.
+- **Light / dark theme toggle.** A new icon button next to the language switch cycles through follow-system, light and dark. The choice is remembered across restarts; follow-system (the default) keeps tracking your OS setting live.
+- **Accent colors.** A button next to the theme toggle cycles the UI accent through mono, blue, green, violet and orange, each tuned for light and dark mode; the choice is remembered across restarts.
+- **Traditional Chinese UI.** A zh-TW dictionary with Taiwan wording joins English, Spanish and Simplified Chinese. It is auto-picked on Traditional Chinese systems and selectable via the 简 / 繁 buttons in the language switcher.
+- **Uncensored model confirmation.** The Uncensored option now carries a hover warning and asks for confirmation before switching, with a link to the community discussion about those weights; a "don't ask again" checkbox remembers your decision.
+- **Unsupported model combinations are disabled.** Speed options that have no weights for the selected model (e.g. Uncensored + Turbo) are now greyed out in both the setup screen and the main UI instead of being selectable.
+
 ## 0.3.0 — 2026-10-11
 
 - **Turbo speed tier.** Pick the distilled 8-step checkpoint instead of the 20–40-step standard one: about 3–4× faster sampling. It is orthogonal to the VRAM profile and the DiT choice, so you can run Turbo on Balanced or Compact; the Uncensored model doesn't have Turbo weights yet and falls back to the standard checkpoint. Selectable in the app (setup screen and main UI) and in the CLI (`qil setup --speed turbo`, `qil config --speed turbo`).
