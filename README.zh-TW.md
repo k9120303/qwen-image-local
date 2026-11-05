@@ -63,9 +63,11 @@ Qwen-Image-2.1 於 2026 年 9 月 20 日發布。它是第一個既**好用**又
 | **創作** | 文字生圖 | 草稿 1024² · 標準 1.6 MP · 最高原生 2K，七種畫面比例，可鎖定種子 |
 | **速度** | Turbo 極速 | 蒸餾而成的 8 步權重，取樣快約 3–4 倍；可搭配任一種顯示記憶體配置 |
 | **模型** | 官方 / 無審查 | 在安裝畫面或主畫面切換圖像模型；編碼器和 VAE 共用，只需換一個檔案 |
+| **下載來源** | 官方 / hf-mirror | 權重可從 huggingface.co 或鏡像站 hf-mirror.com 下載；也可一鍵複製直接連結，自行下載後指向該資料夾 |
 | **透明** | 原生 RGBA | 模型直接輸出真正的 alpha 通道，不是靠事後去背 |
 | **編輯** | 1–10 張參考圖 | 重新打光、改變風格、移除物體或人物、改寫招牌文字、合成主體；第一張圖是畫布 |
 | **標註** | 圖片編輯器 | 參考圖送進模型前可以先畫、圈選、框選、加箭頭、擦除或裁切；支援復原、縮放和 90° 旋轉 |
+| **介面** | 主題與強調色 | 跟隨系統、淺色、深色三種主題，外加五種強調色；選擇會記住，重新啟動後依然有效 |
 | **隨機驚喜** | 創意產生器 | 風格 × 主體 × 地點 × 光線，或一個精選創意；可填主題 |
 | **安裝** | 一行指令建置 + 一次性安裝 | 固定版本的 ComfyUI、Python 3.12、PyTorch CUDA 13，權重支援續傳與 SHA-256 驗證 |
 | **命令列** | `qil` | `doctor` · `setup` · `generate` · `edit` · `surprise` · `bench` · `config` |
@@ -204,6 +206,7 @@ Ready. Try: qil generate "a red fox asleep in the snow" --preset draft
 ```bash
 qil setup                                             # 安裝；依你的顯示記憶體自動選擇配置
 qil config --speed turbo                              # 任一種配置都可以搭配 8 步蒸餾取樣
+qil config --source mirror                            # 改從鏡像站 hf-mirror.com 下載權重
 qil generate "一隻在雪地裡睡著的紅狐狸" --preset draft
 qil generate "瑪黛茶杯貼紙" --transparent --aspect 1:1
 qil edit "把場景改成下雪的冬夜" -i street.jpg --preset standard
