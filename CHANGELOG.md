@@ -1,12 +1,15 @@
 # Changelog
 
-## 0.4.0 — 2026-10-19
+## 0.4.0 — 2026-10-31
 
+- **Download source: official or hf-mirror.** Pick where the weights come from — huggingface.co or hf-mirror.com — on the setup screen, in the app or via the CLI (`qil setup --source mirror`, `qil config --source mirror`). The mirror is a drop-in hostname swap, so the files and checksums are identical. The setup screen also lists the exact URLs for the current model combination with a one-click copy button: download them yourself and point the app at the folder.
+- **Light / dark theme toggle.** A new icon button next to the language switch cycles through follow-system, light and dark. The choice is remembered across restarts; follow-system (the default) keeps tracking your OS setting live.
+- **Accent colors.** A button next to the theme toggle cycles the UI accent through mono, blue, green, violet and orange, each tuned for light and dark mode; the choice is remembered across restarts.
+- **Traditional Chinese UI.** A zh-TW dictionary with Taiwan wording joins English, Spanish and Simplified Chinese. It is auto-picked on Traditional Chinese systems and selectable via the 简 / 繁 buttons in the language switcher.
+- **Uncensored model confirmation.** The Uncensored option now carries a hover warning and asks for confirmation before switching, with a link to the community discussion about those weights; a "don't ask again" checkbox remembers your decision.
+- **Unsupported model combinations are disabled.** Speed options that have no weights for the selected model (e.g. Uncensored + Turbo) are now greyed out in both the setup screen and the main UI instead of being selectable.
 - **Everything lives next to the exe.** `config.json`, the engine (`runtime\`, which also holds the default models folder), generated images (`output\`) and the UI's WebView2 data (`webview\`) now default to the folder holding the exe instead of `%APPDATA%`, `%LOCALAPPDATA%` and Pictures. Unzip it anywhere you can write to; uninstalling is deleting that folder. An install made by an earlier version keeps using its old paths.
-- **Download source.** Fetch the weights from Hugging Face or the hf-mirror.com mirror, for networks where huggingface.co is slow or blocked; the setup screen can also copy the download links for an external downloader.
-- **Themes.** Follow the system, light or dark, plus an accent color (mono, blue, green, violet, orange) for the primary button.
-- **Traditional Chinese.** UI dictionary with Taiwan wording, auto-picked for zh-TW/HK/MO, and a `README.zh-TW.md`.
-- **Uncensored model warning.** Picking the third-party uncensored weights shows a warning that their authenticity is disputed, with a link to the community discussion; the option carries a badge.
+- **Traditional Chinese README.** `README.zh-TW.md`.
 
 ## 0.3.0 — 2026-10-11
 
